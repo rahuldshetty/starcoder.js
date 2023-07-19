@@ -35,7 +35,7 @@ var Module = typeof Module != 'undefined' ? Module : {};
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
       var PACKAGE_NAME = 'main.data';
-      var REMOTE_PACKAGE_BASE = 'https://raw.githubusercontent.com/rahuldshetty/starcoder.js/main/docs/main.data';
+      var REMOTE_PACKAGE_BASE = 'https://media.githubusercontent.com/media/rahuldshetty/starcoder.js/85313171a40830b01de029484453292c2969f3cb/docs/main.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
