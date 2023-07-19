@@ -1,0 +1,6 @@
+#paragraph {
+	align-content: center;
+	align-items: center;
+	display: flex;
+	gap: 0.2em;
+}
