@@ -64,7 +64,8 @@
       </p>
 
       <p>
-        Custom trained starcoder model have to quantized into standard GGML format. You can find the quanztization steps in this project's Github repository. 
+        Model has to be quantized in GGML format and pre-loaded into <i>main.data</i> file. 
+        You can find instructions on how to quantize a model in this project's Github repository.
       </p>
 
       <p>
@@ -112,7 +113,7 @@ def fibonacci(</textarea
         >
 
         <button id="submitBtn" disabled>
-            Ask AI
+            Generate
         </button>
       </form>
      
@@ -124,8 +125,6 @@ def fibonacci(</textarea
 
     <script type="module">
       import { callMain, Module as mod } from "./modified-main.js";
-      //let mod = {};
-      //const callMain = () => {};
 
       let output = document.getElementById("output");
       let submitButton = document.getElementById("submitBtn");
@@ -134,8 +133,6 @@ def fibonacci(</textarea
       let progressElement = document.getElementById("progress");
       let resultSection = document.getElementById("result");
 
-      // define arguments
-      // Module['arguments'] = [
 
       let default_args = [
         //'-p', 'def fibonnaci(',
@@ -220,6 +217,7 @@ def fibonacci(</textarea
       };
 
       async function runMain() {
+        document.getElementById("output").textContent = ""
         submitButton.disabled = true;
         const text = document.getElementById("textInput").value;
         callMain(default_args.concat(["-p", text]));
