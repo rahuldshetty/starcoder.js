@@ -1,10 +1,27 @@
 # 💫StarCoder.js *\*Experimental*\*
 
-Web browser version of [StarCoder.cpp](https://github.com/bigcode-project/starcoder.cpp).
+`THIS IS UNDER DEVELOPMENT AND IS NOT PRODUCTION READY. BROWSER REQUIRES MEM64 SUPPORT TO RUN THIS PROJECT`
 
-`THIS IS UNDER DEVELOPMENT AND IS NOT PRODUCTION READY. BROWSER REQUIRED MEM64 SUPPORT TO RUN THIS PROJECT`
+This project brings [starcoder.cpp](https://github.com/bigcode-project/starcoder.cpp) to browser with power of WebAssembly.
 
-* Project tested on Firefox Nightly Version: 117.0a1 (2023-07-18) (64-bit)
+## Demo
+
+![App](assets/app.PNG)
+
+![Fibonacci Example](assets/fibonacci.PNG)
+
+### Performance
+
+
+![Prime Example](assets/prime.PNG)
+
+Following performance speed is captured on Firefox Nightly with following system configuration:
+* CPU: Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+* Memory: 24GB
+
+![Generation Performance](assets/performance.PNG)
+
+# Build Instructions
 
 ```
 git clone https://github.com/bigcode-project/starcoder.cpp
