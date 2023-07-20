@@ -23,7 +23,12 @@
       <h1>starcoder.js🌟</h1>
 
       <p>
-        ⚠️<strong><i>This is an Experimental Project and might not run in all the browsers.</i></strong>⚠️
+        ⚠️<strong
+          ><i
+            >This is an Experimental Project and might not run in all the
+            browsers.</i
+          ></strong
+        >⚠️
       </p>
 
       <p id="paragraph">
@@ -64,16 +69,19 @@
       </p>
 
       <p>
-        Model has to be quantized in GGML format and pre-loaded into <i>main.data</i> file. 
-        You can find instructions on how to quantize a model in this project's Github repository.
+        Model has to be quantized in GGML format and pre-loaded into
+        <i>main.data</i> file. You can find instructions on how to quantize a
+        model in this project's Github repository.
       </p>
 
       <p>
-        In this demo, <strong>tiny_starcoder_py</strong> model (184M) is first downloaded & loaded into the browser through WASM.
+        In this demo, <strong>tiny_starcoder_py</strong> model (184M) is first
+        downloaded & loaded into the browser through WASM.
       </p>
 
       <p>
-        Once the model has been loaded successfully, then you can paste in Python Code snippet for auto-completion.
+        Once the model has been loaded successfully, then you can paste in
+        Python Code snippet for auto-completion.
       </p>
 
       <h3>Links</h3>
@@ -99,11 +107,10 @@
           🤗 tiny_starcoder_py
         </a>
       </p>
-    
+
       <h2>Demo</h2>
-      
-      <div class="spinner" id="spinner"></div>
-      <div class="emscripten" id="status"></div>
+
+      <i><div id="status"></div></i>
       <progress value="0" max="100" id="progress" hidden="1"></progress>
 
       <form onsubmit="event.preventDefault();">
@@ -112,128 +119,110 @@
 def fibonacci(</textarea
         >
 
-        <button id="submitBtn" disabled>
-            Generate
-        </button>
+        <button id="submitBtn" disabled>Generate</button>
       </form>
-     
-      <div id="result" style="display:none;">
+
+      <div id="result" style="display: none">
         <h3>Result</h3>
         <pre><code id="output"></code></pre>
       </div>
     </div>
 
     <script type="module">
-      import { callMain, Module as mod } from "./modified-main.js";
+      import event from "./events.js";
 
+      // Web Page Elements
       let output = document.getElementById("output");
       let submitButton = document.getElementById("submitBtn");
-      let spinnerElement = document.getElementById("spinner");
       let statusElement = document.getElementById("status");
       let progressElement = document.getElementById("progress");
       let resultSection = document.getElementById("result");
 
+      // Defaults
+      let default_args = ["--top_p", "0.85", "--temp", "0.2", "-n", "50"];
 
-      let default_args = [
-        //'-p', 'def fibonnaci(',
-        //'-t', '4',
-        // '--top_k', '0',
-        "--top_p", "0.85",
-        "--temp", "0.2",
-        "-n", "50",
-      ];
+      // State variables
+      let worker;
 
-      // mod['preRun'] = [];
-      // mod['postRun'] = [];
-
+      // helper methods
       const filter_output = (text) => {
-        if(text){
-            if (
-                text.startsWith("main:") || 
-                text.startsWith("starcoder_model_load:")
-            ){
-                return false;
-            }
-            return true;
-        } else {
-            return false;
+        if (text.startsWith("main:") || text.startsWith("starcoder_model_load:")){
+          return false;
         }
+        return true;
       }
 
-      mod['print'] = (text) => {
-        console.log("stdout: " + text);
-        // show output only when required
-        if(filter_output(text)){
-            document.getElementById("output").textContent  += text + "\n";
-
-            if (resultSection.hasAttribute("style"))
-                resultSection.style.removeProperty("display");
-        }
-      };
-
-      mod["totalDependencies"] = 0;
-
-      mod["setStatus"] = (text) => {
-        if (!mod.setStatus.last)
-          mod.setStatus.last = { time: Date.now(), text: "" };
-        if (text === mod.setStatus.last.text) return;
-        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-        var now = Date.now();
-        if (m && now - mod.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-        mod.setStatus.last.time = now;
-        mod.setStatus.last.text = text;
-        if (m) {
-          text = m[1];
-          progressElement.value = parseInt(m[2]) * 100;
-          progressElement.max = parseInt(m[4]) * 100;
-          progressElement.hidden = false;
-          spinnerElement.hidden = false;
+      const update_status = (text, error) => {
+        if (error) {
+          submitButton.disabled = true;
         } else {
-          progressElement.value = null;
-          progressElement.max = null;
-          progressElement.hidden = true;
-          if (!text) spinnerElement.style.display = "none";
+          submitButton.disabled = false;
         }
         statusElement.innerHTML = text;
       };
 
-      mod["monitorRunDependencies"] = (left) => {
-        mod.totalDependencies = Math.max(mod.totalDependencies, left);
-        mod.setStatus(
-          left
-            ? "Preparing... (" +
-                (mod.totalDependencies - left) +
-                "/" +
-                mod.totalDependencies +
-                ")"
-            : "All downloads complete."
-        );
-        if (!left) {
-          submitButton.disabled = false;
-        } else {
-          submitButton.disabled = true;
-          resultSection.style.display = 'none';
+      const update_output = (line) => {
+        if(filter_output(line)){
+          output.textContent  += line + "\n";
+        }
+      }
+
+      function start_task_auto_complete() {
+        console.log("startig...")
+        // clear existing output
+        output.textContent = "";
+        update_status("Inferencing...", true);
+
+        const text = document.getElementById("textInput").value;
+        const args = default_args.concat(["-p", text]);
+
+        // trigger worker event
+        worker.postMessage({
+          event: event.TASK_CODE_AUTO_COMPLETE,
+          args: args,
+        });
+
+        // output section hidden before start
+        if (resultSection.hasAttribute("style"))
+          resultSection.style.removeProperty("display");
+      }
+
+      // Check web worker support
+      if (window.Worker) {
+        worker = new Worker("worker-modified-main.js", { type: "module" });
+      } else {
+        update_status("Web Worker not Supported!", true);
+      }
+
+      // Receive updates from worker
+      worker.onmessage = (e) => {
+        switch (e.data.event) {
+          case event.LOADING: {
+            update_status("Loading Model...", true);
+            break;
+          }
+
+          case event.UPDATE_PROGRESS: {
+            progressElement.value = e.data.value;
+            progressElement.max = e.data.max;
+            progressElement.hidden = e.data.hidden;
+            update_status(e.data.innerHTML, !e.data.hidden);
+            break;
+          }
+
+          case event.TASK_FINISH: {
+            update_status(e.data.result, false);
+            break;
+          }
+
+          case event.INSERT_OUTPUT: {
+            update_output(e.data.line);
+            break;
+          }
         }
       };
 
-      async function runMain() {
-        document.getElementById("output").textContent = ""
-        submitButton.disabled = true;
-        const text = document.getElementById("textInput").value;
-        callMain(default_args.concat(["-p", text]));
-        submitButton.disabled = false;
-      }
-
-      submitButton.addEventListener("click", runMain);
-
-      window.onerror = (event) => {
-        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
-        mod.setStatus("Exception thrown, see JavaScript console");
-        spinnerElement.style.display = "none";
-        mod.setStatus = (text) => {
-          if (text) console.error("[post-exception status] " + text);
-        };
-      };
+      submitButton.addEventListener("click", start_task_auto_complete);
     </script>
   </body>
 </html>

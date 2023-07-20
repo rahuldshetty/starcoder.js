@@ -39,6 +39,14 @@ const setStatusFn =  (text) => {
   });
 }
 
+const printLineFn = (text) => {
+  console.log('worker:' + text);
+  postMessage({
+    event: event.INSERT_OUTPUT,
+    line: text
+  });
+}
+
 // include: shell.js
 // The Module object: Our interface to the outside world. We import
 // and export values on it. There are various ways Module can be used:
@@ -57,6 +65,7 @@ var Module = typeof Module != 'undefined' ? Module : {};
 
 // Override module functions for web worker
 Module['setStatus'] = setStatusFn;
+Module['print'] = printLineFn;
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
@@ -5705,6 +5714,17 @@ if (Module['noInitialRun']) shouldRunNow = false;
 run();
 
 self.addEventListener('message', (e) => {
-  console.log('worker: '+ e);
-});
+  switch(e.data.event){
+    case event.TASK_CODE_AUTO_COMPLETE: {
+      console.log("startig called..")
+      callMain(e.data.args);
+      // return completion status to main thred
+      postMessage({
+        event: event.TASK_FINISH,
+        result: ''
+      });
+      break;
+    }
+  }
+}, false);
 
