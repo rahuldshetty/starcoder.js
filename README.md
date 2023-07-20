@@ -6,6 +6,8 @@ This project brings [starcoder.cpp](https://github.com/bigcode-project/starcoder
 
 ## Demo
 
+Web Application : [starcoder.js](https://rahuldshetty.github.io/starcoder.js/)
+
 ![App](assets/app.PNG)
 
 ![Fibonacci Example](assets/fibonacci.PNG)
