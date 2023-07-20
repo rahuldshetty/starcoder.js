@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title></title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>starcoder.js</title>
@@ -114,10 +113,41 @@
       <progress value="0" max="100" id="progress" hidden="1"></progress>
 
       <form onsubmit="event.preventDefault();">
-        <label for="textInput">Write Python Code to auto-complete</label>
+        <label for="textInput">Enter Python Code:</label>
         <textarea id="textInput" name="textInput" rows="4" cols="50">
 def fibonacci(</textarea
         >
+
+        <details> 
+          <summary>Model Parameters</summary> 
+          
+          <div id="modelparams">
+            <div>
+              <label for="seed">RNG Seed</label>
+              <input type="number" name="seed" id="seed" value="-1">
+            </div>
+            
+            <div>
+            <label for="tokens">No. of tokens</label>
+            <input type="number" name="tokens" id="tokens" value="64">
+             </div>
+
+            <div>
+              <label for="top_k">top_k</label>
+              <input type="number" name="top_k" id="top_k" value="40">
+            </div>
+
+            <div>
+              <label for="top_p">top_p</label>
+              <input type="number" name="top_p" id="top_p" value="0.85">
+            </div>
+            
+            <div>
+              <label for="temperature">temperature</label>
+              <input type="number" name="temperature" id="temperature" value="1.0">
+            </div>
+          </div>
+        </details>
 
         <button id="submitBtn" disabled>Generate</button>
       </form>
@@ -138,13 +168,14 @@ def fibonacci(</textarea
       let progressElement = document.getElementById("progress");
       let resultSection = document.getElementById("result");
 
-      // Defaults
-      let default_args = ["--top_p", "0.85", "--temp", "0.2", "-n", "50"];
-
       // State variables
       let worker;
 
       // helper methods
+      const get_input_value = (id) => {
+        return document.getElementById(id).value;
+      }
+
       const filter_output = (text) => {
         if (text.startsWith("main:") || text.startsWith("starcoder_model_load:")){
           return false;
@@ -174,7 +205,14 @@ def fibonacci(</textarea
         update_status("Inferencing...", true);
 
         const text = document.getElementById("textInput").value;
-        const args = default_args.concat(["-p", text]);
+        const args = [
+            "-p", text,
+            "-s", get_input_value("seed"),
+            "-n", get_input_value("tokens"),
+            "--top_k", get_input_value("top_k"),
+            "--top_p", get_input_value("top_p"),
+            "--temp", get_input_value("temperature"),
+        ];
 
         // trigger worker event
         worker.postMessage({
