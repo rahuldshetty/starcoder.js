@@ -1,3 +1,44 @@
+import event from "./events.js";
+
+// WEB WORKER PROCESSES
+// start loading process
+let web_worker_state = {
+
+}
+
+postMessage({
+  event: event.LOADING
+});
+
+// progress updated
+const setStatusFn =  (text) => {
+  if (!web_worker_state.last)
+    web_worker_state.last = { time: Date.now(), text: "" };
+  if (text === web_worker_state.last.text) return;
+  var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+  var now = Date.now();
+  if (m && now - web_worker_state.last.time < 30) return; // if this is a progress update, skip it if too soon
+  web_worker_state.last.time = now;
+  web_worker_state.last.text = text;
+
+  let result = {}
+  if (m) {
+    text = m[1];
+    result.value = parseInt(m[2]) * 100;
+    result.max = parseInt(m[4]) * 100;
+    result.hidden = false;
+  } else {
+    result.value = null;
+    result.max = null;
+    result.hidden = true;
+  }
+  result.innerHTML = text;
+  postMessage({
+    event: event.UPDATE_PROGRESS,
+    ...result
+  });
+}
+
 // include: shell.js
 // The Module object: Our interface to the outside world. We import
 // and export values on it. There are various ways Module can be used:
@@ -13,6 +54,9 @@
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
 var Module = typeof Module != 'undefined' ? Module : {};
+
+// Override module functions for web worker
+Module['setStatus'] = setStatusFn;
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
@@ -5660,27 +5704,7 @@ if (Module['noInitialRun']) shouldRunNow = false;
 
 run();
 
-
-// end include: postamble.js
-// export {Module, callMain};
-
-////////////////////
-/* Message Format:
-////////////////////
-
-{
-  type: setModule,
-  property: property,
-  value: value
-}
-
-*/
-
-addEventListener('message', e => {
-  if (e.data.type === 'setModule') {
-    Module[e.data.property] = Module[e.data.value]
-  } else if (e.data.type === 'callModule') {
-    Module[e.data.property](...Module[e.data.value])
-  } 
+self.addEventListener('message', (e) => {
+  console.log('worker: '+ e);
 });
 

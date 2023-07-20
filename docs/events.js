@@ -1,0 +1,6 @@
+const EVENT = {
+    LOADING: 'LOADING',
+    UPDATE_PROGRESS: 'UPDATE_PROGRESS',
+}
+
+export default EVENT

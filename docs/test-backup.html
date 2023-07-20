@@ -124,9 +124,10 @@ def fibonacci(</textarea
     </div>
 
     <script type="module">
-      import event from "./events.js";
+      const worker = new Worker("./worker-modified-main.js", { type: "module" });
 
-      // Web Page Elements
+      // import { callMain, Module as mod } from "./modified-main.js";
+
       let output = document.getElementById("output");
       let submitButton = document.getElementById("submitBtn");
       let spinnerElement = document.getElementById("spinner");
@@ -134,52 +135,133 @@ def fibonacci(</textarea
       let progressElement = document.getElementById("progress");
       let resultSection = document.getElementById("result");
 
-      // Defaults
+
       let default_args = [
+        //'-p', 'def fibonnaci(',
+        //'-t', '4',
+        // '--top_k', '0',
         "--top_p", "0.85",
         "--temp", "0.2",
         "-n", "50",
       ];
 
-      // State variables
-      let worker;
+      const filter_output = (text) => {
+        if(text){
+            if (
+                text.startsWith("main:") || 
+                text.startsWith("starcoder_model_load:")
+            ){
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+      }
 
-      // helper methods
-      
-      const update_status = (text, error) => {
-        if(error){
-          submitButton.disabled = true;
-        } else{
-          submitButton.disabled = false;
+      const set_module = (key, func) => {
+        worker.postMessage({
+            type: 'setModule',
+            property: key,
+            value: func
+        });
+      }
+
+      const set_state = (key, value) => {
+        worker.postMessage({
+            type: 'setState',
+            property: key,
+            value: value
+        });
+      }
+
+      const call_module = (func, ...params) => {
+        worker.postMessage({
+            type: 'callModule',
+            property: func,
+            value: params
+        });
+      }
+
+      // print function
+      const printFn = (text) => {
+        console.log("stdout: " + text);
+        // show output only when required
+        if(filter_output(text)){
+            document.getElementById("output").textContent  += text + "\n";
+
+            if (resultSection.hasAttribute("style"))
+                resultSection.style.removeProperty("display");
+        }
+      };
+
+      // setStatus functon
+      const setStatusFn =  (text) => {
+        if (!mod.setStatus.last)
+          mod.setStatus.last = { time: Date.now(), text: "" };
+        if (text === mod.setStatus.last.text) return;
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+        var now = Date.now();
+        if (m && now - mod.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+        mod.setStatus.last.time = now;
+        mod.setStatus.last.text = text;
+        if (m) {
+          text = m[1];
+          progressElement.value = parseInt(m[2]) * 100;
+          progressElement.max = parseInt(m[4]) * 100;
+          progressElement.hidden = false;
+          spinnerElement.hidden = false;
+        } else {
+          progressElement.value = null;
+          progressElement.max = null;
+          progressElement.hidden = true;
+          if (!text) spinnerElement.style.display = "none";
         }
         statusElement.innerHTML = text;
       }
 
+      // monitoring function
+      const monitorFn = (left) => {
+        mod.totalDependencies = Math.max(mod.totalDependencies, left);
+        call_module('setStatus',
+          left
+            ? "Preparing... (" +
+                (mod.totalDependencies - left) +
+                "/" +
+                mod.totalDependencies +
+                ")"
+            : "All downloads complete."
+        );
+        if (!left) {
+          submitButton.disabled = false;
+        } else {
+          submitButton.disabled = true;
+          resultSection.style.display = 'none';
+        }
+      };
 
-      // Check web worker support
-      if (window.Worker) {
-        worker = new Worker("worker-modified-main.js", { type: "module" });
-      } else {  
-        update_status("Web Worker not Supported!", true);
+      set_module("monitorRunDependencies", JSON.stringify(monitorFn));
+      set_module('print', JSON.stringify(printFn));
+      set_state("totalDependencies", 0);
+      set_module("setStatus", JSON.stringify(setStatusFn));
+
+      async function runMain() {
+        document.getElementById("output").textContent = ""
+        submitButton.disabled = true;
+        const text = document.getElementById("textInput").value;
+        callMain(default_args.concat(["-p", text]));
+        submitButton.disabled = false;
       }
 
-      // Receive updates from worker
-      worker.onmessage = (e) => {
-        switch(e.data.event) {
-           
-           case event.LOADING: {
-              update_status("Loading Model...", true);
-              break;
-           }
+      submitButton.addEventListener("click", runMain);
 
-            case event.UPDATE_PROGRESS: {
-              progressElement.value = e.data.value;
-              progressElement.max = e.data.max;
-              progressElement.hidden = e.data.hidden;
-              update_status(e.data.innerHTML, !e.data.hidden)
-            }
-
-        }
+      window.onerror = (event) => {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        call_module('setStatus', "Exception thrown, see JavaScript console");
+        spinnerElement.style.display = "none";
+        set_module('setStatus', (text) => {
+          if (text) console.error("[post-exception status] " + text);
+        });
       };
     </script>
   </body>
