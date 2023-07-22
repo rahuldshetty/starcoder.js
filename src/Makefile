@@ -189,7 +189,7 @@ common.o: common.cpp common.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -vf *.o main main.{html,wasm,js,data,worker.js} quantize
+	rm -vf *.o main main.html main.js main.html main.wasm quantize
 
 #
 # Examples
@@ -201,7 +201,7 @@ main: main.cpp common.o ggml.o $(OBJS)
 	@echo '====  Run ./main -h for help.  ===='
 	@echo
 
-main.html: main.cpp common.o ggml.o $(OBJS)
+main.js: main.cpp common.o ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
 
 quantize: quantize.cpp ggml.o common.o $(OBJS)
