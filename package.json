@@ -1,0 +1,30 @@
+{
+  "name": "starcoder.js",
+  "version": "1.0.0",
+  "description": "Web port of starcoder.cpp project",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahuldshetty/starcoder.js.git"
+  },
+  "keywords": [
+    "starcoder",
+    "edgeai",
+    "ai",
+    "ml",
+    "llm"
+  ],
+  "author": "Rahul D Shetty",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rahuldshetty/starcoder.js/issues"
+  },
+  "homepage": "https://github.com/rahuldshetty/starcoder.js#readme"
+}
