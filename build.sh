@@ -1,6 +1,6 @@
 set -e
 
-cd src/
+cd starcoder.cpp/
 
 make clean
 
