@@ -8,7 +8,8 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,12 @@
   "bugs": {
     "url": "https://github.com/rahuldshetty/starcoder.js/issues"
   },
-  "homepage": "https://github.com/rahuldshetty/starcoder.js#readme"
+  "homepage": "https://github.com/rahuldshetty/starcoder.js#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "jest": "^29.6.1",
+    "jest-environment-jsdom": "^29.6.1",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  }
 }
