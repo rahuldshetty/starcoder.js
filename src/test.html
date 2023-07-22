@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    
+    <script type="module">
+        import Module from "./main.js";
+
+        const model_path = '../models/tiny_starcoder_py-ggml-q8_0.bin'
+        const model_fs_path = '/models/model.bin';
+        
+        const model_args = [
+            "-p", `def fibonacci(n):`,
+            "-n", '64',
+            '-m', model_fs_path
+        ];
+
+        var args = {
+            'noInitialRun': true,
+        }
+        
+        // load
+        Module(args).then((mod)=>{
+            // load binary data for model into filesystem
+            const callback = (bytes) => {
+                // create virtual fs folder for storing model bins
+                mod['FS_createPath']("/", "models", true, true);
+
+                // load model
+                mod['FS_createDataFile']('/models', 'model.bin', bytes, true, true, true);
+            
+                // perform inference
+                mod['callMain'](model_args)
+
+                console.log("done...")
+            }
+            loadBinaryResource(model_path, callback)
+        })
+        
+        function loadBinaryResource(url, callback) {
+            const req = new XMLHttpRequest();
+            req.open("GET", url, true);
+            req.responseType = "arraybuffer";
+
+            req.onload = (event) => {
+                const arrayBuffer = req.response; // Note: not req.responseText
+                if (arrayBuffer) {
+                    const byteArray = new Uint8Array(arrayBuffer);
+                    callback(byteArray)
+                }
+            };
+
+            req.send(null);
+        }
+
+    </script>
+
+    </body>
+</html>
