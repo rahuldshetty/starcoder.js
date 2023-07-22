@@ -16,6 +16,9 @@ endif
 CCV := $(shell $(CC) --version | head -n 1)
 CXXV := $(shell $(CXX) --version | head -n 1)
 
+# Destination directory to generate build files
+TARGET := ../build
+
 # Mac OS + Arm can report x86_64
 # ref: https://github.com/ggerganov/whisper.cpp/issues/66#issuecomment-1282546789
 ifeq ($(UNAME_S),Darwin)
@@ -182,27 +185,27 @@ $(info )
 # Build library
 #
 
-ggml.o: ggml.c ggml.h ggml-cuda.h
-	$(CC)  $(CFLAGS)   -c $< -o $@
+$(TARGET)/ggml.o: ggml.c ggml.h ggml-cuda.h
+	$(CC)  $(CFLAGS)   -c $< -o $(TARGET)/$@
 
-common.o: common.cpp common.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET)/common.o: common.cpp common.h
+	$(CXX) $(CXXFLAGS) -c $< -o $(TARGET)/$@
 
 clean:
-	rm -vf *.o main main.html main.js main.html main.wasm quantize
+	rm -vf $(TARGET)/*.o $(TARGET)/main $(TARGET)/main.html $(TARGET)/main.js $(TARGET)/main.html $(TARGET)/main.wasm $(TARGET)/quantize
 
 #
 # Examples
 #
 
-main: main.cpp common.o ggml.o $(OBJS)
-	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
-	@echo
-	@echo '====  Run ./main -h for help.  ===='
-	@echo
+# main: main.cpp $(TARGET)/common.o $(TARGET)/ggml.o $(OBJS)
+# 	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $(TARGET)/$@ $(LDFLAGS)
+# 	@echo
+# 	@echo '====  Run ./main -h for help.  ===='
+# 	@echo
 
-main.js: main.cpp common.o ggml.o $(OBJS)
-	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
+main.js: main.cpp $(TARGET)/common.o $(TARGET)/ggml.o $(OBJS)
+	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $(TARGET)/$@ $(LDFLAGS)
 
-quantize: quantize.cpp ggml.o common.o $(OBJS)
-	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
+# quantize: quantize.cpp ggml.o common.o $(OBJS)
+# 	$(CXX) $(CXXFLAGS) $(filter-out %.h,$^) -o $(TARGET)/$@ $(LDFLAGS)
