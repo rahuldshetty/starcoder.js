@@ -13,7 +13,3 @@ export function loadBinaryResource(url, callback) {
 
     req.send(null);
 }
-
-export function isFunction(functionToCheck) {
-    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}

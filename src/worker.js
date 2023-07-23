@@ -1,10 +1,9 @@
 import action from "./actions.js";
-import Module from "./main.js";
+import Module from "../build/main.js";
 import {loadBinaryResource} from "./utility.js"
 
 // WASM Module
 let module;
-
 
 // Module Parameters for Wasm JS script
 const model_fs_path = '/models/model.bin'; // virtual filesystem path

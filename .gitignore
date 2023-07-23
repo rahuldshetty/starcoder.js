@@ -28,3 +28,4 @@ xcuserdata/
 
 node_modules
 dist
+types/

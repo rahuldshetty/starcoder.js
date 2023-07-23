@@ -15,7 +15,10 @@ export class StarCoder{
     }
     
     load_worker() {
-        this.worker = new Worker("./worker.js", {type: 'module'});
+        this.worker = new Worker(
+            new URL('./worker.js', import.meta.url)
+            , {type: 'module'});
+        
 
         this.worker.onmessage = (event) => {
             switch (event.data.event) {
