@@ -9,17 +9,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default {
   mode: 'development',  
   experiments: {
+    asyncWebAssembly: true,
     outputModule: true,
+    syncWebAssembly: true,
   },
   context: __dirname + '/src',
   entry:  './starcoder.js',
   // target: ['web'],
   output: {
     filename: 'starcoder.js',
-    path: path.resolve(__dirname, 'dist'),
-    library: {
-        type: 'module',
-    },
+    path: path.resolve(__dirname, 'dist')
   },
   devServer: {
     static: {
@@ -32,7 +31,7 @@ export default {
     new CopyPlugin({
       patterns: [
         { 
-            from: "build/main.*",
+            from: "../build/main.*",
             to: "[name][ext]" 
         },
       ],

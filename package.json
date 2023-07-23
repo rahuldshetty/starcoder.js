@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "description": "`THIS IS UNDER DEVELOPMENT AND IS NOT PRODUCTION READY. BROWSER REQUIRES MEM64 SUPPORT TO RUN THIS PROJECT`",
-  "main": "starcoder.js",
+  "main": "./src/starcoder.js",
   "directories": {
     "doc": "docs",
     "example": "examples"
