@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    <h3>
+        Status: <h4 style="red" id="status">Not Loaded</h4>
+    </h3>
+
+    <script type="module">
+        import {StarCoder} from "./index.js";
+
+        const on_loaded = () => {
+            console.log('model: Loaded')
+            document.getElementById('status').innerText = 'LOADED'
+        }
+
+        const write_result = (text) => {
+            console.log('model:' + text);
+        }
+
+        const app = new StarCoder(
+            '../models/tiny_starcoder_py-ggml-q8_0.bin',
+            on_loaded,
+            write_result
+        );
+        
+        app.load_worker()
+
+    </script>
+
+    </body>
+</html>
