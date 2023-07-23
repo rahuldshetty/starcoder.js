@@ -1,5 +1,7 @@
 set -e
 
+mkdir -p ./build
+
 cd starcoder.cpp/
 
 make clean
