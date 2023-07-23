@@ -38,6 +38,8 @@ struct gpt_params {
     int32_t top_k = 40;
     float   top_p = 0.9f;
     float   temp  = 0.9f;
+    int32_t repeat_last_n  = 64;
+    float   repeat_penalty = 1.00f;
 
     int32_t n_batch = 8; // batch size for prompt processing
 
@@ -107,6 +109,18 @@ gpt_vocab::id gpt_sample_top_k_top_p(
         double temp,
         std::mt19937 & rng);
 
+
+gpt_vocab::id gpt_sample_top_k_top_p_repeat(
+        const gpt_vocab & vocab,
+        const float * logits,
+        const int32_t * last_n_tokens_data,
+        size_t last_n_tokens_data_size,
+        int    top_k,
+        double top_p,
+        double temp,
+        int repeat_last_n,
+        float repeat_penalty,
+        std::mt19937 & rng);
 //
 // Audio utils
 //

@@ -9,6 +9,11 @@
     <h3>
         Status: <h4 style="red" id="status">Not Loaded</h4>
     </h3>
+    
+    <textarea rows="4" cols="50" id="textInput"></textarea>
+    <button id="submitBtn" disabled="true">Loading Model...</button>
+
+    <pre><code id="output"></code></pre>
 
     <script type="module">
         import {StarCoder} from "./index.js";
@@ -16,19 +21,41 @@
         const on_loaded = () => {
             console.log('model: Loaded')
             document.getElementById('status').innerText = 'LOADED'
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerText = "Generate";
         }
 
-        const write_result = (text) => {
-            console.log('model:' + text);
+        const write_result = (line) => {
+            document.getElementById('output').textContent  += line + "\n";
         }
+
+        const run_model = () => {
+            const text = document.getElementById("textInput").value;
+            document.getElementById('submitBtn').innerText = "Running...";
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('output').textContent = "";
+            app.run({
+                prompt: text,
+                top_k: 1
+            });
+        }
+
+        const run_complete = () => {
+            document.getElementById('submitBtn').innerText = "Generate";
+            document.getElementById('submitBtn').disabled = false;
+        }
+        
+        // '../models/tiny_starcoder_py-ggml-q8_0.bin',
 
         const app = new StarCoder(
-            '../models/tiny_starcoder_py-ggml-q8_0.bin',
+            '../models/model.bin',
             on_loaded,
-            write_result
+            write_result,
+            run_complete
         );
         
-        app.load_worker()
+        app.load_worker();
+        document.getElementById('submitBtn').addEventListener("click", run_model);
 
     </script>
 
