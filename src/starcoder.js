@@ -1,6 +1,6 @@
 import action from "./actions.js";
 
-class StarCoder{
+export class StarCoder{
     // callback have to be defined before load_worker
     constructor(
         url,
@@ -17,7 +17,8 @@ class StarCoder{
     load_worker() {
         this.worker = new Worker(
             new URL('./worker.js', import.meta.url)
-            , {type: 'module'});
+            , {type: 'module'}
+        );
         
 
         this.worker.onmessage = (event) => {
@@ -71,5 +72,3 @@ class StarCoder{
         });
     }
 }
-
-export default StarCoder

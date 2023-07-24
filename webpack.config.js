@@ -1,54 +1,49 @@
-// const path = require('path');
-// const CopyPlugin = require("copy-webpack-plugin");
-import CopyPlugin from 'copy-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
-  mode: 'development',  
-  experiments: {
-    asyncWebAssembly: true,
-    outputModule: true,
-    syncWebAssembly: true,
-  },
-  context: __dirname + '/src',
-  entry:  './starcoder.js',
-  // target: ['web'],
-  output: {
-    filename: 'starcoder.js',
-    path: path.resolve(__dirname, 'dist')
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
+    mode: 'development',
+    devtool: 'source-map',
+    entry:  {
+        // include dist in entry point so that when running dev server,
+        // we can access the files with /dist/...
+        'dist/starcoder': './src/starcoder.js'
     },
-    compress: true,
-    port: 9000
-  },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        { 
-            from: "../build/main.*",
-            to: "[name][ext]" 
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'starcoder.js',
+        library: 'starcoder',
+        libraryTarget:'umd'
+    },
+    plugins: [
+        // Copy .wasm files to dist folder
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'build/main.*',
+                    to: '[name][ext]'
+                },
+            ],
+        }),
+    ],
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            test: /\.min\.js$/,
+            extractComments: false,
+        })],
+    },
+    devServer: {
+        static: {
+            directory: __dirname
         },
-      ],
-  }),
-],
-resolve: {
-    extensions: [".ts", ".js"],
-},
-module: {
-    rules: [
-        {
-            test: /main\.js$/,
-            type: "asset/resource",
-            generator: {
-                filename: "[name].js"
-            }
-        }
-    ]
-  },
-}
+        port: 8080
+    },
+    experiments: {
+        outputModule: true,
+    }
+};
