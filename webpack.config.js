@@ -11,13 +11,19 @@ export default {
     entry:  {
         // include dist in entry point so that when running dev server,
         // we can access the files with /dist/...
-        'dist/starcoder': './src/starcoder.js'
+        'dist/starcoder': './src/starcoder.js',
+    }, 
+    resolve: {
+        alias: {
+          Build: path.resolve(__dirname, 'build/'),
+        },
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
         filename: 'starcoder.js',
-        library: 'starcoder',
-        libraryTarget:'umd'
+        path: __dirname,
+        library: {
+            type: 'module',
+        },
     },
     plugins: [
         // Copy .wasm files to dist folder
@@ -36,12 +42,6 @@ export default {
             test: /\.min\.js$/,
             extractComments: false,
         })],
-    },
-    devServer: {
-        static: {
-            directory: __dirname
-        },
-        port: 8080
     },
     experiments: {
         outputModule: true,
