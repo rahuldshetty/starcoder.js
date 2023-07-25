@@ -16,9 +16,10 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-  </head>
-  <body>
-    <div class="container">
+</head>
+<body>
+
+<div class="container">
       <h1>starcoder.js🌟</h1>
 
       <p>
@@ -74,7 +75,7 @@
       </p>
 
       <p>
-        In this demo, <strong>tiny_starcoder_py</strong> model (184M) is first
+        In this demo, <strong>tiny_starcoder_py</strong> model (154) is first
         downloaded & loaded into the browser through WASM.
       </p>
 
@@ -108,8 +109,6 @@
       </p>
 
       <h2>Demo</h2>
-
-      <i><div id="status"></div></i>
       <progress value="0" max="100" id="progress" hidden="1"></progress>
 
       <form onsubmit="event.preventDefault();">
@@ -149,118 +148,59 @@ def fibonacci(</textarea
           </div>
         </details>
 
-        <button id="submitBtn" disabled>Generate</button>
+        <button id="submitBtn" disabled>Loading Model...</button>
       </form>
 
-      <div id="result" style="display: none">
+      <div id="result">
         <h3>Result</h3>
         <pre><code id="output"></code></pre>
       </div>
     </div>
 
     <script type="module">
-      import event from "./events.js";
+        import {StarCoder} from "../dist/starcoder.js";
 
-      // Web Page Elements
-      let output = document.getElementById("output");
-      let submitButton = document.getElementById("submitBtn");
-      let statusElement = document.getElementById("status");
-      let progressElement = document.getElementById("progress");
-      let resultSection = document.getElementById("result");
+        let submitButton = document.getElementById('submitBtn');
+        let outputElement = document.getElementById('output');
 
-      // State variables
-      let worker;
-
-      // helper methods
-      const get_input_value = (id) => {
-        return document.getElementById(id).value;
-      }
-
-      const filter_output = (text) => {
-        if (text.startsWith("main:") || text.startsWith("starcoder_model_load:")){
-          return false;
+        const on_loaded = () => {
+            submitButton.disabled = false;
+            submitButton.innerText = "Generate";
         }
-        return true;
-      }
 
-      const update_status = (text, error) => {
-        if (error) {
-          submitButton.disabled = true;
-        } else {
-          submitButton.disabled = false;
+        const write_result = (line) => {
+            outputElement.textContent  += line + "\n";
         }
-        statusElement.innerHTML = text;
-      };
 
-      const update_output = (line) => {
-        if(filter_output(line)){
-          output.textContent  += line + "\n";
+        const run_model = () => {
+            const text = document.getElementById("textInput").value;
+            submitButton.innerText = "Running...";
+            submitButton.disabled = true;
+            outputElement.textContent = ""; // clead old content
+            app.run({
+                prompt: text,
+                top_k: 1
+            });
         }
-      }
 
-      function start_task_auto_complete() {
-        console.log("startig...")
-        // clear existing output
-        output.textContent = "";
-        update_status("Inferencing...", true);
-
-        const text = document.getElementById("textInput").value;
-        const args = [
-            "-p", text,
-            "-s", get_input_value("seed"),
-            "-n", get_input_value("tokens"),
-            "--top_k", get_input_value("top_k"),
-            "--top_p", get_input_value("top_p"),
-            "--temp", get_input_value("temperature"),
-        ];
-
-        // trigger worker event
-        worker.postMessage({
-          event: event.TASK_CODE_AUTO_COMPLETE,
-          args: args,
-        });
-
-        // output section hidden before start
-        if (resultSection.hasAttribute("style"))
-          resultSection.style.removeProperty("display");
-      }
-
-      // Check web worker support
-      if (window.Worker) {
-        worker = new Worker("worker-modified-main.js", { type: "module" });
-      } else {
-        update_status("Web Worker not Supported!", true);
-      }
-
-      // Receive updates from worker
-      worker.onmessage = (e) => {
-        switch (e.data.event) {
-          case event.LOADING: {
-            update_status("Loading Model...", true);
-            break;
-          }
-
-          case event.UPDATE_PROGRESS: {
-            progressElement.value = e.data.value;
-            progressElement.max = e.data.max;
-            progressElement.hidden = e.data.hidden;
-            update_status(e.data.innerHTML, !e.data.hidden);
-            break;
-          }
-
-          case event.TASK_FINISH: {
-            update_status(e.data.result, false);
-            break;
-          }
-
-          case event.INSERT_OUTPUT: {
-            update_output(e.data.line);
-            break;
-          }
+        const run_complete = () => {
+            submitButton.innerText = "Generate";
+            submitButton.disabled = false;
         }
-      };
+        
+        // '../models/tiny_starcoder_py-ggml-q8_0.bin',
 
-      submitButton.addEventListener("click", start_task_auto_complete);
+        const app = new StarCoder(
+            'https://huggingface.co/rahuldshetty/tiny_starcoder_py_ggml/resolve/main/tiny_starcoder_py-ggml-q4_0.bin',
+            on_loaded,
+            write_result,
+            run_complete
+        );
+        
+        app.load_worker();
+        submitButton.addEventListener("click", run_model);
+
     </script>
-  </body>
+
+    </body>
 </html>

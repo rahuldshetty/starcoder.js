@@ -4,6 +4,7 @@
 .vs/
 .vscode/
 .DS_Store
+*.log
 
 build/
 build-em/
@@ -24,3 +25,6 @@ compile_commands.json
 
 project.xcworkspace/xcuserdata/
 xcuserdata/
+
+node_modules
+types/
