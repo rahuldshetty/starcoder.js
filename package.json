@@ -5,17 +5,18 @@
     "type": "module",
     "main": "dist/starcoder.js",
     "scripts": {
-      "build": "webpack"
+        "build": "webpack"
     },
     "keywords": [],
     "author": "Rahul D Shetty",
     "license": "ISC",
     "devDependencies": {
-      "@babel/core": "^7.22.9",
-      "@babel/preset-env": "^7.22.9",
-      "babel-loader": "^9.1.3",
-      "webpack": "^5.88.2",
-      "webpack-cli": "^5.1.4"
+        "@babel/core": "^7.22.9",
+        "@babel/plugin-proposal-class-properties": "^7.18.6",
+        "@babel/preset-env": "^7.22.9",
+        "babel-loader": "^9.1.3",
+        "copy-webpack-plugin": "^11.0.0",
+        "webpack": "^5.88.2",
+        "webpack-cli": "^5.1.4"
     }
-  }
-  
+}

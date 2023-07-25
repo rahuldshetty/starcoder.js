@@ -1,5 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,15 +17,15 @@ export default  {
   },
   module: {
     rules: [
+      // {
+      //   test: /main\.js$/,
+      //   type: 'asset',
+      // },
       {
         test: /\.(js)$/,
-        exclude: /node_modules/,
-        use: "babel-loader",
-      },
-      {
-        test: /main\.js$/i,
-        type: 'asset/resource',
-      },
+        exclude: [/node_modules/, /\\build\\main\.js/],
+        use: 'babel-loader',
+      }
     ]
   },
   mode: "development",

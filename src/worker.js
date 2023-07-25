@@ -5,9 +5,6 @@ import {loadBinaryResource} from "./utility.js"
 // WASM Module
 let module;
 
-// Module Parameters for Wasm JS script
-const model_fs_path = '/models/model.bin'; // virtual filesystem path
-
 // Function to send model line result
 const write_result_fn = (text) => {
     // console.log('worker:' + text);
@@ -82,6 +79,8 @@ const run_main = (
         "--repeat-last-n", repeat_last_n.toString(),
         "--repeat-penalty", repeat_penalty.toString()
     ];
+
+    console.log("Running on args:" + args)
 
     module['callMain'](args);
 
