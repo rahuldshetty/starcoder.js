@@ -15,19 +15,33 @@ export default  {
       type: "module",
     },
   },
+  externals: {
+    "main": "./main.js"
+  },
   module: {
     rules: [
-      // {
-      //   test: /main\.js$/,
-      //   type: 'asset',
-      // },
       {
         test: /\.(js)$/,
-        exclude: [/node_modules/, /\\build\\main\.js/],
+        exclude: [/node_modules/, /\\build\\main\.js$/],
         use: 'babel-loader',
       }
     ]
   },
+  plugins: [
+        // Copy .wasm files to dist folder
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'build/main.js',
+                    to: 'main.js'
+                },
+              //   {
+              //     from: 'build/main.wasm',
+              //     to: 'main.wasm'
+              // },
+            ],
+        }),
+    ],
   mode: "development",
   experiments: {
     outputModule: true,

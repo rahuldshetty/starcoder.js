@@ -18,10 +18,7 @@
     <script type="module">
         import {StarCoder} from "../dist/starcoder.js";
 
-        console.log(StarCoder)
-
         const on_loaded = () => {
-            console.log('model: Loaded')
             document.getElementById('status').innerText = 'LOADED'
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('submitBtn').innerText = "Generate";

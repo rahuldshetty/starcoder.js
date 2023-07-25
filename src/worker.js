@@ -1,5 +1,5 @@
 import {action} from "./actions.js";
-import Module from "../build/main.js";
+import Module from "main";
 import {loadBinaryResource} from "./utility.js"
 
 // WASM Module
@@ -8,6 +8,7 @@ let module;
 // Function to send model line result
 const write_result_fn = (text) => {
     // console.log('worker:' + text);
+    console.log('model:' + text)
     postMessage({
       event: action.WRITE_RESULT,
       line: text
@@ -37,6 +38,8 @@ const init_worker_fn = async (model_path) => {
         postMessage({
             event: action.INITIALIZED
         });
+
+        console.log('model: Loaded')
     }
 
     loadBinaryResource(model_path, initCallback)
@@ -80,13 +83,13 @@ const run_main = (
         "--repeat-penalty", repeat_penalty.toString()
     ];
 
-    console.log("Running on args:" + args)
-
+    console.log('model: calling main...')
     module['callMain'](args);
 
     postMessage({
         event: action.RUN_COMPLETED
     });
+    console.log('model: Completed')
 } 
 
 // Worker Events
