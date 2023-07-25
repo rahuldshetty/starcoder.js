@@ -2,7 +2,7 @@
     "name": "starcoderjs",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/starcoder.js",
+    "main": "starcoder.js",
     "types": "./types/starcoder.d.ts",
     "type": "module",
     "scripts": {

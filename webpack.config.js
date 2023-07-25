@@ -13,6 +13,9 @@ export default {
         // we can access the files with /dist/...
         'dist/starcoder': './src/starcoder.js',
     }, 
+    externals: {
+        starcoder: ['./main.js', 'starcoder'],
+    },
     resolve: {
         alias: {
           Build: path.resolve(__dirname, 'build/'),
@@ -20,10 +23,9 @@ export default {
     },
     output: {
         filename: 'starcoder.js',
-        path: __dirname,
-        library: {
-            type: 'module',
-        },
+        path: path.resolve(__dirname, 'dist/'),
+        library: 'starcoder',
+        libraryTarget: 'umd',
     },
     plugins: [
         // Copy .wasm files to dist folder
@@ -45,5 +47,7 @@ export default {
     },
     experiments: {
         outputModule: true,
+        asyncWebAssembly: true,
+        syncWebAssembly: true
     }
 };
