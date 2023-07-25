@@ -890,5 +890,9 @@ int main(int argc, char ** argv) {
 
     ggml_free(model.ctx);
 
+    fflush(stdout);
+
+    printf("\n\n");
+
     return 0;
 }
