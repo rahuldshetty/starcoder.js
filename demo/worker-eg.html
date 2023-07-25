@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>starcoder.js</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+</head>
+<body>
     <h3>
         Status: <h4 style="red" id="status">Not Loaded</h4>
     </h3>
@@ -16,7 +28,7 @@
     <pre><code id="output"></code></pre>
 
     <script type="module">
-        import {StarCoder} from "../dist/starcoder.js";
+        import {StarCoder} from "https://unpkg.com/starcoder.js@1.0.0/dist/starcoder.js";
 
         const on_loaded = () => {
             document.getElementById('status').innerText = 'LOADED'
@@ -47,7 +59,7 @@
         // '../models/tiny_starcoder_py-ggml-q8_0.bin',
 
         const app = new StarCoder(
-            '../models/model.bin',
+            'https://huggingface.co/rahuldshetty/tiny_starcoder_py_ggml/resolve/main/tiny_starcoder_py-ggml-q4_0.bin',
             on_loaded,
             write_result,
             run_complete

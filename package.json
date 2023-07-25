@@ -1,13 +1,22 @@
 {
     "name": "starcoder.js",
-    "version": "1.0.0",
-    "description": "",
+    "version": "1.0.1",
+    "description": "Web browser version of StarCoder.cpp",
     "type": "module",
     "main": "dist/starcoder.js",
     "scripts": {
         "build": "webpack"
     },
-    "keywords": [],
+    "keywords": [
+        "AI",
+        "ML",
+        "EdgeAI",
+        "LLM"
+    ],
+    "repository": { 
+        "type": "git", 
+        "url":  "https://github.com/rahuldshetty/starcoder.js"
+    },
     "author": "Rahul D Shetty",
     "license": "ISC",
     "devDependencies": {
@@ -18,5 +27,10 @@
         "copy-webpack-plugin": "^11.0.0",
         "webpack": "^5.88.2",
         "webpack-cli": "^5.1.4"
-    }
+    },
+    "files": [
+        "src",
+        "dist",
+        "README.md"
+    ]
 }
