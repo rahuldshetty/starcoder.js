@@ -73,4 +73,4 @@ class StarCoder{
     }
 }
 
-export default StarCoder
+export {StarCoder}
