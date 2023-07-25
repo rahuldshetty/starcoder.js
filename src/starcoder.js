@@ -1,6 +1,6 @@
-import action from "./actions.js";
+import {action} from "./actions.js";
 
-export class StarCoder{
+class StarCoder{
     // callback have to be defined before load_worker
     constructor(
         url,
@@ -72,3 +72,5 @@ export class StarCoder{
         });
     }
 }
+
+export default StarCoder
