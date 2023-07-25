@@ -16,8 +16,9 @@
     <pre><code id="output"></code></pre>
 
     <script type="module">
-        import StarCoder from "../src/bundle.js";
+        import {StarCoder} from "../dist/starcoder.js";
 
+        console.log(StarCoder)
 
         const on_loaded = () => {
             console.log('model: Loaded')
